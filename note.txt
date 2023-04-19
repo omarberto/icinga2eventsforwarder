@@ -1,0 +1,10 @@
+gestire errore nats ...
+
+gestire errore http_clineyt
+
+Opzionale:
+
+a. fare con goroutine il mangae del messaggio
+b. array di accumulo in lettura
+c. scrittura batch ...
+
