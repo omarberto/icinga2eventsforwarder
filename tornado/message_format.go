@@ -2,9 +2,9 @@ package tornado
 
 import (
     "encoding/json"
-	//"errors"
-	"fmt"
-	"os"
+	"log"
+	//"fmt"
+	//"os"
 	
 	//"wp/icinga2eventsforwarder/nats"
 	"wp/icinga2eventsforwarder/mariadb/icingasql"
@@ -35,10 +35,8 @@ func (mess *Message) Parse(hostname string, icinga2json string) ([]byte, error) 
 	err := json.Unmarshal([]byte(icinga2json), &checkResultObj)
 
 	if err != nil {
-		fmt.Println("error in unmarhal", icinga2json)
-		fmt.Println(err)
-		//os.Exit(1)
-		//inserire log
+		log.Println("error in unmarhal", icinga2json)
+		log.Println(err)
 		return nil, err
 	}
 
@@ -66,12 +64,10 @@ func (mess *Message) Parse(hostname string, icinga2json string) ([]byte, error) 
 	tornadoMessage, err := json.Marshal(tornadoMessageObj)
 
     if err != nil {
-        fmt.Println(err)
-		os.Exit(1)
+		log.Println(err)
+		return nil, err
     }
 	
-	//fmt.Println("\nStruct is:", string(tornadoMessage))
-
 	return tornadoMessage, nil
 }
 
