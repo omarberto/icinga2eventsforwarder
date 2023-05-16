@@ -35,7 +35,7 @@ func (mess *Message) Parse(hostname string, icinga2json string) ([]byte, error) 
 	err := json.Unmarshal([]byte(icinga2json), &checkResultObj)
 
 	if err != nil {
-		log.Println("error in unmarhal", icinga2json)
+		//log.Println("error in unmarhal", icinga2json)
 		log.Println(err)
 		return nil, err
 	}

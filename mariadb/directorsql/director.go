@@ -51,6 +51,8 @@ func InitSQLdata(hostname string, c *config.MYSQL) {
 			{
 				readDeletedHosts(hostname)
 				readDeletedServices(hostname)
+				readChangedHosts(hostname)
+				readChangedServices(hostname)
 				time.Sleep(refreshInterval)
 			}
 		}()
@@ -58,6 +60,7 @@ func InitSQLdata(hostname string, c *config.MYSQL) {
 }
 
 func readDeletedHosts(hostname string) {
+	log.Println("readDeletedHosts start")
 	
     db, err := sql.Open("mysql", connectionString)
     defer db.Close()
@@ -125,6 +128,7 @@ func sqlFormat(t time.Time) string {
 	return fmt.Sprintf("%04d-%02d-%02d %02d:%02d:%02d", t.Year(),t.Month(),t.Day(),t.Hour(),t.Minute(),t.Second())
 }
 func readDeletedServices(hostname string) {
+	log.Println("readDeletedServices start")
 	
     db, err := sql.Open("mysql", connectionString)
     defer db.Close()
@@ -216,7 +220,8 @@ func readDeletedServices(hostname string) {
 }
 
 func readChangedHosts(hostname string) {
-	
+	log.Println("readChangedHosts start")
+
     db, err := sql.Open("mysql", connectionString)
     defer db.Close()
 
@@ -291,6 +296,7 @@ func readChangedHosts(hostname string) {
 	log.Println("readChangedHosts end")
 }
 func readChangedServices(hostname string) {
+	log.Println("readChangedServices start")
 	
     db, err := sql.Open("mysql", connectionString)
     defer db.Close()
