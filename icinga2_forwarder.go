@@ -1,8 +1,9 @@
 package main
 
 import (
-	"fmt"
 	"flag"
+	"fmt"
+
 	//"log"
 	"os"
 	//"sort"
@@ -10,57 +11,69 @@ import (
 
 	//"bufio"
 	//"encoding/json"
-	
+
 	//"config/config"
 	"wp/icinga2eventsforwarder/config"
 	"wp/icinga2eventsforwarder/httpclient"
 	"wp/icinga2eventsforwarder/nats"
 
-	"wp/icinga2eventsforwarder/mariadb/icingasql"
 	"wp/icinga2eventsforwarder/mariadb/directorsql"
+	"wp/icinga2eventsforwarder/mariadb/icingasql"
 	//"github.com/urfave/cli/v2"
 	//"github.com/influxdata/telegraf/config"
 )
 
-
 //import "github.com/nats-io/nats.go"
 
 // func runApp(args []string, c I2EFConfig, m App) error {
-	
-// 	return m.Run(args[0])
-// }
+
+//		return m.Run(args[0])
+//	}
+var xyz string
 
 func main() {
+	var versionArg bool
+	var configFilePath string
 
-	var configFileArg bool
-	var configFile string
-	flag.BoolVar(&configFileArg, "config", false, "configuration file path")
-    flag.Parse()
+	flag.BoolVar(&versionArg, "version", false, "return app version")
+	flag.StringVar(&configFilePath, "config", "", "configuration file path")
 
-    if !configFileArg {
+	// var configFileArg bool
+	// var configFile string
+	// flag.BoolVar(&configFileArg, "config", false, "configuration file path")
+	flag.Parse()
+
+	if versionArg {
+
+		fmt.Println(xyz)
+		return
+	}
+
+	if configFilePath == `` {
 		fmt.Println("No configuration file")
 		return
 	}
 
-	args := os.Args
-    for index, arg := range args {
-		if arg == "-config" || arg == "--config" {
-			if index + 1 == len(args) { 
-				fmt.Println("No configuration file")
-				return
-			}else{
-				configFile = args[index + 1]
-			}
-		}
-	}
+	// args := os.Args
 
-	agent := I2EF{ }
-	agent.loadConfiguration(configFile)
+	// for index, arg := range args {
+	// 	if arg == "-config" || arg == "--config" {
+	// 		if index+1 == len(args) {
+	// 			fmt.Println("No configuration file")
+	// 			return
+	// 		} else {
+	// 			configFile = args[index+1]
+	// 		}
+	// 	}
+	// }
 
-    _ = icingasql.InitSQLdata(agent.conf.Icinga)
-    directorsql.InitSQLdata(agent.conf.Agent.Host, agent.conf.Director)
+	agent := I2EF{}
+	agent.loadConfiguration(configFilePath)
 
-    var natsClient = nats.GetNATSclient()
+	_ = icingasql.InitSQLdata(agent.conf.Icinga)
+	directorsql.InitSQLdata(agent.conf.Agent.Host, agent.conf.Director)
+
+	var natsClient = nats.GetNATSclient()
 	natsClient.Connect(agent.conf.Nats)
 
 	fmt.Println("natsClient.Connected")
@@ -81,15 +94,14 @@ type I2EF struct {
 // func (t *I2EF) Init(pprofErr <-chan error) {
 // 	t.pprofErr = pprofErr
 
-
 // }
 
-func (t *I2EF) loadConfiguration(configFilePath string) (error) {
+func (t *I2EF) loadConfiguration(configFilePath string) error {
 	// If no other options are specified, load the config file and run.
 	t.conf = config.LoadConfiguration(configFilePath)
 	if t.conf.Agent == nil {
-		t.conf.Agent = &config.AGENT { Host: "" }
-	} 
+		t.conf.Agent = &config.AGENT{Host: ""}
+	}
 	if t.conf.Agent.Host == "" {
 
 		hostname, err := os.Hostname()
@@ -99,7 +111,7 @@ func (t *I2EF) loadConfiguration(configFilePath string) (error) {
 		}
 		t.conf.Agent.Host = strings.ToLower(hostname)
 	}
-    fmt.Println("config host", t.conf.Agent.Host)
+	fmt.Println("config host", t.conf.Agent.Host)
 
 	return nil
 }
@@ -111,6 +123,7 @@ func (t *I2EF) runReader() {
 	stream.Run(t.conf.Agent.Host)
 	fmt.Println("run Reader ended")
 }
+
 // func (t *I2EF) runAgent(ctx context.Context, c *config.Config) error {
 // 	var err error
 
@@ -122,27 +135,8 @@ func (t *I2EF) runReader() {
 // 	// // For platforms that use systemd, telegraf doesn't log if the notification failed.
 // 	// _, _ = daemon.SdNotify(false, daemon.SdNotifyReady)
 
-
-
 // 	return ag.Run(ctx)
 // }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 type App interface {
 	Init(<-chan error)
