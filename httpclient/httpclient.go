@@ -1,20 +1,18 @@
 package httpclient
 
 import (
-	"time"
+	"bufio"
+	"crypto/tls"
 	"fmt"
-    "bufio"
 	"net/http"
-    "crypto/tls"
+	"time"
 
 	"wp/icinga2eventsforwarder/config"
-	"wp/icinga2eventsforwarder/tornado"
 	"wp/icinga2eventsforwarder/nats"
+	"wp/icinga2eventsforwarder/tornado"
 )
 
-
 type HTTPstream struct {
-
 	conf *config.EVENTSSTREAM
 
 	//conn       *nats.Conn
@@ -25,8 +23,8 @@ func (s *HTTPstream) Init(c *config.EVENTSSTREAM) {
 }
 
 func (s *HTTPstream) Run(hostname string) {
-	
-    fmt.Println("UrlRequest: ", s.conf.UrlRequest)
+
+	fmt.Println("UrlRequest: ", s.conf.UrlRequest)
 
 	for {
 
@@ -50,13 +48,11 @@ func (s *HTTPstream) Run(hostname string) {
 			continue
 		}
 
-
 		// Read the response header
 		fmt.Println("Response: Server:", resp.Header.Get("Server"))
 		fmt.Println("Response: Status:", resp.Status)
 		fmt.Println("Response: Proto:", resp.Proto)
 		fmt.Println("Response: Content-Type:", resp.Header.Get("Content-Type"))
-
 
 		// Read the response body
 
@@ -78,7 +74,7 @@ func (s *HTTPstream) Run(hostname string) {
 			fmt.Println("Error reading HTTP response: ", err.Error())
 			time.Sleep(1 * time.Second)
 			continue
-		}   
+		}
 
 	}
 }
