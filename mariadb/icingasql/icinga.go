@@ -89,7 +89,7 @@ func readGroups() map[string][]string {
     }
 
 //    res, err := db.Query("select h.alias as host,GROUP_CONCAT(g.alias) as groups from icinga_hostgroup_members m join icinga_hostgroups g on g.hostgroup_id=m.hostgroup_id join icinga_hosts h on h.host_object_id=m.host_object_id group by h.alias")
-    res, err := db.Query("select oh.name1 as host,GROUP_CONCAT(og.name1) as groups from icinga_hostgroup_members m join icinga_hostgroups g on g.hostgroup_id=m.hostgroup_id join icinga_objects og on og.object_id=g.hostgroup_object_id join icinga_hosts h on h.host_object_id=m.host_object_id join icinga_objects oh on oh.object_id=h.host_object_id where og.is_active=1 and oh.is_active=1 group by oh.name1")
+    res, err := db.Query("select oh.name1 as host,GROUP_CONCAT(DISTINCT og.name1 ORDER BY og.name1 ASC) as groups from icinga_hostgroup_members m join icinga_hostgroups g on g.hostgroup_id=m.hostgroup_id join icinga_objects og on og.object_id=g.hostgroup_object_id join icinga_hosts h on h.host_object_id=m.host_object_id join icinga_objects oh on oh.object_id=h.host_object_id where og.is_active=1 and oh.is_active=1 group by oh.name1")
 
     defer res.Close()
 
