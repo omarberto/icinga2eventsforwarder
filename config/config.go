@@ -13,8 +13,8 @@ type Config struct {
 
 	EventsStream *EVENTSSTREAM
 	Nats     *NATS
-	Director *MYSQL
-	Icinga *MYSQL
+	Director *DIRECTORMYSQL
+	Icinga *ICINGAMYSQL
 }
 
 type AGENT struct {

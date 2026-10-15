@@ -59,6 +59,10 @@ func InitSQLdata(hostname string, c *config.MYSQL) {
 	}
 }
 
+func sqlFormat(t time.Time) string {
+	return fmt.Sprintf("%04d-%02d-%02d %02d:%02d:%02d", t.Year(),t.Month(),t.Day(),t.Hour(),t.Minute(),t.Second())
+}
+
 func readDeletedHosts(hostname string) {
 	log.Println("readDeletedHosts start")
 	
@@ -69,7 +73,10 @@ func readDeletedHosts(hostname string) {
         log.Fatal(err)
     }
 
-    res, err := db.Query("select object_name,convert_tz(change_time,@@session.time_zone,'+00:00') as change_time_utc from director_activity_log where action_name = 'delete' and object_type = 'icinga_host' and convert_tz(change_time,@@session.time_zone,'+00:00') > '" + sqlFormat(lastDeleteHostTime) + "'")
+    // TODO: Replace with query from config
+    //res, err := db.Query("select object_name,convert_tz(change_time,@@session.time_zone,'+00:00') as change_time_utc from director_activity_log where action_name = 'delete' and object_type = 'icinga_host' and convert_tz(change_time,@@session.time_zone,'+00:00') > '" + sqlFormat(lastDeleteHostTime) + "'")
+	query := fmt.Sprintf(DeletedHostsQuery, sqlFormat(lastDeleteHostTime))
+	res, err := db.Query(query)
 
     defer res.Close()
 
@@ -124,9 +131,7 @@ func readDeletedHosts(hostname string) {
 
 	log.Println("readDeletedHosts end")
 }
-func sqlFormat(t time.Time) string {
-	return fmt.Sprintf("%04d-%02d-%02d %02d:%02d:%02d", t.Year(),t.Month(),t.Day(),t.Hour(),t.Minute(),t.Second())
-}
+
 func readDeletedServices(hostname string) {
 	log.Println("readDeletedServices start")
 	
@@ -137,7 +142,10 @@ func readDeletedServices(hostname string) {
         log.Fatal(err)
     }
 
-    res, err := db.Query("select object_name,old_properties,convert_tz(change_time,@@session.time_zone,'+00:00') as change_time_utc from director_activity_log where action_name = 'delete' and object_type = 'icinga_service' and convert_tz(change_time,@@session.time_zone,'+00:00') > '" + sqlFormat(lastDeletedServiceTime) + "'")
+    //res, err := db.Query("select object_name,old_properties,convert_tz(change_time,@@session.time_zone,'+00:00') as change_time_utc from director_activity_log where action_name = 'delete' and object_type = 'icinga_service' and convert_tz(change_time,@@session.time_zone,'+00:00') > '" + sqlFormat(lastDeletedServiceTime) + "'")
+	//replace the above query with the following
+	query := fmt.Sprintf(DeletedServicesQuery, sqlFormat(lastDeletedServiceTime))
+    res, err := db.Query(query)
 
     defer res.Close()
 
@@ -229,7 +237,10 @@ func readChangedHosts(hostname string) {
         log.Fatal(err)
     }
 
-    res, err := db.Query("select object_name,old_properties,new_properties,convert_tz(change_time,@@session.time_zone,'+00:00') as change_time_utc from director_activity_log where action_name = 'modify' and object_type = 'icinga_host' and convert_tz(change_time,@@session.time_zone,'+00:00') > '" + sqlFormat(lastChangedHostTime) + "'")
+    //res, err := db.Query("select object_name,old_properties,new_properties,convert_tz(change_time,@@session.time_zone,'+00:00') as change_time_utc from director_activity_log where action_name = 'modify' and object_type = 'icinga_host' and convert_tz(change_time,@@session.time_zone,'+00:00') > '" + sqlFormat(lastChangedHostTime) + "'")
+	//replace the above query with the following
+	query := fmt.Sprintf(ChangedHostsQuery, sqlFormat(lastChangedHostTime))
+	res, err := db.Query(query)
 
     defer res.Close()
 
@@ -305,7 +316,10 @@ func readChangedServices(hostname string) {
         log.Fatal(err)
     }
 
-    res, err := db.Query("select object_name,old_properties,new_properties,convert_tz(change_time,@@session.time_zone,'+00:00') as change_time_utc from director_activity_log where action_name = 'modify' and object_type = 'icinga_service' and convert_tz(change_time,@@session.time_zone,'+00:00') > '" + sqlFormat(lastChangedServiceTime) + "'")
+    //res, err := db.Query("select object_name,old_properties,new_properties,convert_tz(change_time,@@session.time_zone,'+00:00') as change_time_utc from director_activity_log where action_name = 'modify' and object_type = 'icinga_service' and convert_tz(change_time,@@session.time_zone,'+00:00') > '" + sqlFormat(lastChangedServiceTime) + "'")
+	//replace the above query with the following
+	query := fmt.Sprintf(ChangedServicesQuery, sqlFormat(lastChangedServiceTime))
+    res, err := db.Query(query)
 
     defer res.Close()
 

@@ -17,6 +17,7 @@ import (
 var lock = &sync.Mutex{}
 
 var connectionString string
+var readGroupsQuery string
 var firstcall bool = true
 var refreshInterval time.Duration = 60 * time.Second
 var Hostgroups map[string][]string = make(map[string][]string)
@@ -24,8 +25,7 @@ func InitSQLdata(c *config.MYSQL) map[string][]string {
 	if firstcall {
 		firstcall = false
 		connectionString = c.Username + ":" + c.Password + c.Connection
-
-		
+		readGroupsQuery = c.ReadGroupsQuery
 
 		if c.RefreshInterval == "" {
 			//c.RefreshInterval = 60 * time.Second
@@ -62,6 +62,7 @@ func getGroups() {
 	//HostgroupsTmp := readGroupsFake()
 	
 	fmt.Println("getGroups HostgroupsTmp: ", len(HostgroupsTmp))
+	
 	lock.Lock()
 	defer lock.Unlock()
 
@@ -88,8 +89,7 @@ func readGroups() map[string][]string {
         log.Fatal(err)
     }
 
-//    res, err := db.Query("select h.alias as host,GROUP_CONCAT(g.alias) as groups from icinga_hostgroup_members m join icinga_hostgroups g on g.hostgroup_id=m.hostgroup_id join icinga_hosts h on h.host_object_id=m.host_object_id group by h.alias")
-    res, err := db.Query("select oh.name1 as host,GROUP_CONCAT(DISTINCT og.name1 ORDER BY og.name1 ASC) as groups from icinga_hostgroup_members m join icinga_hostgroups g on g.hostgroup_id=m.hostgroup_id join icinga_objects og on og.object_id=g.hostgroup_object_id join icinga_hosts h on h.host_object_id=m.host_object_id join icinga_objects oh on oh.object_id=h.host_object_id where og.is_active=1 and oh.is_active=1 group by oh.name1")
+    res, err := db.Query(c.ReadGroupsQuery)
 
     defer res.Close()
 
